@@ -6,6 +6,8 @@
 
 package tftpclient;
 
+import tftpclient.View.Fmain;
+
 /**
  *
  * @author Antoine
@@ -17,7 +19,7 @@ public class TFTPClient {
      */
     public static void main(String[] args) {
         Fmain test=new Fmain();
-        test.show();
+        test.setVisible(true);
     }
     
 }

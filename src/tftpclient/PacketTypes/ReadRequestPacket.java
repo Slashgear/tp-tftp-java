@@ -6,10 +6,16 @@
 
 package tftpclient.PacketTypes;
 
+import java.net.InetAddress;
+
 /**
  *
  * @author Antoine
  */
-public class ReadRequestPacket {
-    
+public class ReadRequestPacket extends RequestPacket{
+
+    public ReadRequestPacket(String _directory, InetAddress ip, int port, String filename, int opcode) {
+        super(_directory, ip, port, filename, opcode);
+        _dtg=createRequestPacket(ip, port, filename, 1);
+    }
 }

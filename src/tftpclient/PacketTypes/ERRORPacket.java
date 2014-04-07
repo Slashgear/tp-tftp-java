@@ -50,7 +50,7 @@ public class ERRORPacket extends TFTPPacket{
     private String getErrMsg(){
         StringBuilder sbuf=new StringBuilder();
        for(int i= 4;i< _dtg.getData().length;i++){
-           sbuf.append(_dtg.getData()[i]);
+           sbuf.append((char)_dtg.getData()[i]);
        }
        return sbuf.toString();
     }

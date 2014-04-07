@@ -24,7 +24,7 @@ public class ACKPacket extends TFTPPacket {
 
     private DatagramPacket createACKPacket(InetAddress ip, int port, int number) {
         try {
-            byte[] tftp_opcode = intTobyte2(3);
+            byte[] tftp_opcode = intTobyte2(4);
             byte[] tftp_block_nb = intTobyte2(number);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             outputStream.write(tftp_opcode);
