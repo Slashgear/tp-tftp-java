@@ -4,20 +4,12 @@
  * and open the template in the editor.
  */
 
-package tftpclient;
+package tftpclient.PacketTypes;
 
 /**
  *
  * @author Antoine
  */
-public class TFTPClient {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        Fmain test=new Fmain();
-        test.show();
-    }
+public class ReadRequestPacket {
     
 }
