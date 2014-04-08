@@ -18,8 +18,10 @@ public class TFTPClient {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Fmain test=new Fmain();
-        test.setVisible(true);
+        TFTPSend test=new TFTPSend();
+        if(test.Sendfile()==0){
+            System.out.println("Transfers Réussi");
+        }
     }
     
 }

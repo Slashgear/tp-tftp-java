@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +22,7 @@ public abstract class RequestPacket extends TFTPPacket{
     
     protected String _directory;
 
-    public RequestPacket(String _directory,InetAddress ip, int port, String filename,int opcode) {
+    public RequestPacket(String _directory) {
         this._directory = _directory;
     }
     
@@ -39,7 +40,7 @@ public abstract class RequestPacket extends TFTPPacket{
             outputStream.write("octet".getBytes());
             outputStream.write(zero);
             byte[] tftp_data = outputStream.toByteArray();
-
+            System.out.println("Request :"+Arrays.toString(tftp_data));
             return new DatagramPacket(tftp_data, tftp_data.length, ip, port);
         } catch (IOException ex) {
             Logger.getLogger(ACKPacket.class.getName()).log(Level.SEVERE, null, ex);

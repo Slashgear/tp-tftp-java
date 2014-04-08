@@ -18,8 +18,15 @@ import java.util.logging.Logger;
  */
 public class ACKPacket extends TFTPPacket {
 
+    
+
+    
     public ACKPacket(InetAddress ip, int port, int number) {
         _dtg = createACKPacket(ip, port, number);
+    }
+
+    public ACKPacket() {
+        
     }
 
     private DatagramPacket createACKPacket(InetAddress ip, int port, int number) {
@@ -41,5 +48,9 @@ public class ACKPacket extends TFTPPacket {
     public int getBlockNb() {
         int i = (_dtg.getData()[3] << 8) & 0xFF | (_dtg.getData()[2]) & 0xFF;
         return i;
+    }
+    
+    public boolean isACKPacket() {
+        return 4 == getOpcode();
     }
 }

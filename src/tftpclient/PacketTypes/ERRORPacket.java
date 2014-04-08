@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,9 +44,15 @@ public class ERRORPacket extends TFTPPacket{
         
     }
     
+    private boolean isErrorPacket(){
+        return 5== getOpcode();
+    }
+    
     private int getErrorCode(){
-         int i = (_dtg.getData()[3] << 8) & 0xFF | (_dtg.getData()[2]) & 0xFF;
-        return i;
+        ByteBuffer data = ByteBuffer.allocate(2);
+        data.put(_dtg.getData()[2]);
+        data.put((int)1,_dtg.getData()[3]);
+        return (int)data.get();
     }
     private String getErrMsg(){
         StringBuilder sbuf=new StringBuilder();

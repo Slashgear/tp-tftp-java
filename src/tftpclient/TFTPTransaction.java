@@ -2,6 +2,7 @@
 package tftpclient;
 
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,6 +14,7 @@ import java.util.logging.Logger;
 public class TFTPTransaction {
     
     protected DatagramSocket _socket;
+    protected Inet4Address _ip;
     protected int _port_dest;
 
     public TFTPTransaction() {

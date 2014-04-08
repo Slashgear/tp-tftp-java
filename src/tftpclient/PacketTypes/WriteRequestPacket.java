@@ -19,8 +19,8 @@ import java.util.logging.Logger;
  */
 public class WriteRequestPacket extends RequestPacket {
 
-    public WriteRequestPacket(String _directory, InetAddress ip, int port, String filename, int opcode) {
-        super(_directory, ip, port, filename, opcode);
+    public WriteRequestPacket(String _directory,InetAddress ip, int port, String filename) {
+        super(_directory);
         _dtg=createRequestPacket(ip, port, filename,2);
     }
 }
