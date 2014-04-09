@@ -2,6 +2,7 @@ package tftpclient;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
@@ -12,31 +13,34 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tftpclient.PacketTypes.ACKPacket;
 import tftpclient.PacketTypes.DATAPacket;
-import tftpclient.PacketTypes.TFTPPacket;
+import tftpclient.PacketTypes.ERRORPacket;
 import tftpclient.PacketTypes.WriteRequestPacket;
 
 /**
  *
- * @author Antoine
+ * @author Antoine CARON
  */
 public class TFTPSend extends TFTPTransaction {
 
-    private String filename;
+    
+    private File file;
+
     public TFTPSend() {
         super();
-        
-            this._port_dest = 69;
-            filename="platine-noirblanc.jpg";
+
+        this._port_dest = 69;
+        filename = "platine-noirblanc.jpg";
         try {
             this._ip = (Inet4Address) InetAddress.getLocalHost();
         } catch (UnknownHostException ex) {
             Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
         }
-            
+
     }
 
     public boolean checkFile() {
-        return true;
+        file = new File(filename);
+        return file.exists() && file.canRead();
     }
 
     public char Sendfile() {
@@ -53,20 +57,12 @@ public class TFTPSend extends TFTPTransaction {
                     if (!WRQtry()) {
                         return 3;
                     } else {
-                            // DTG for receiving the answer of the server
-                            byte[] data = new byte[1024];
-                            DatagramPacket dtg = new DatagramPacket(data, 1024);
-                            
-                            FileInputStream fis=new FileInputStream(new File(filename));
-                            byte[] buf=new byte[512];
-                            int i=1;
-                            while(fis.read(buf)>=0){
-                                DATAPacket data_packet=new DATAPacket(buf, _ip, _port_dest,i);
-                                _socket.send(data_packet.getDtg());
-                                i++;
-                            }
-                            DATAPacket data_packet=new DATAPacket(new byte[512], _ip, _port_dest,i);
-                            _socket.send(data_packet.getDtg());
+                        System.out.println("Envoi du WRQ réussi \n\nDébut du Transfers...\n");
+                        if (!this.transmit()) {
+                            return 4;
+                        } else {
+                            return 0;
+                        }
                     }
 
                 }
@@ -87,15 +83,14 @@ public class TFTPSend extends TFTPTransaction {
     }
 
     public boolean receiveWRQanswer() {
-        ACKPacket ack_packet = new ACKPacket();
         byte[] data = new byte[1024];
         DatagramPacket dtg = new DatagramPacket(data, 1024);
         try {
             this._socket.receive(dtg);
-            ack_packet.setDtg(dtg);
-            System.out.println("ACK Answer:" +Arrays.toString(dtg.getData()));
-            if (ack_packet.isACKPacket()) {
-                _port_dest = ack_packet.getDtg().getPort();
+            System.out.println("ACK Answer:" + Arrays.toString(dtg.getData()));
+            ERRORPacket er;
+            if (ACKPacket.isACKPacket(dtg) || (ERRORPacket.isErrorPacket(dtg) && 6 == ERRORPacket.getErrorCode(dtg))) {
+                _port_dest = dtg.getPort();
                 return true;
             }
         } catch (IOException ex) {
@@ -117,6 +112,61 @@ public class TFTPSend extends TFTPTransaction {
         }
         return false;
     }
-    
+
+    public boolean transmit() {
+        FileInputStream fis = null;
+        int j = 0;
+        boolean packet_lost = false;
+        try {
+            byte[] data = new byte[1024];
+            DatagramPacket dtg = new DatagramPacket(data, 1024);
+            fis = new FileInputStream(file);
+            byte[] buf = new byte[512];
+            int i = 1;
+            while (fis.read(buf) != -1) {
+                if (!transmitPacket(buf, i)) {
+                    return false;
+                }
+                i++;
+            }
+            if (fis.available() >= 0) {
+                data = new byte[fis.available()];
+                fis.read(data);
+                if (!transmitPacket(data, i)) {
+                    return false;
+                }
+                fis.close();
+                return true;
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    public boolean transmitPacket(byte[] buf, int j) {
+        int i = 0;
+        boolean packet_lost = false;
+        DatagramPacket ack_dtg = new DatagramPacket(new byte[1024], 1024);
+
+        while (i < 3 || packet_lost) {
+            DATAPacket data_packet = new DATAPacket(buf, _ip, _port_dest, j);
+            try {
+                _socket.send(data_packet.getDtg());
+                _socket.receive(ack_dtg);
+                if (ACKPacket.isACKPacket(ack_dtg) && j == ACKPacket.getBlockNb(ack_dtg)) {
+                    System.out.println("ACK  :" + Arrays.toString(ack_dtg.getData()));
+                    packet_lost = true;
+                    return true;
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            i++;
+        }
+        return packet_lost;
+    }
 
 }

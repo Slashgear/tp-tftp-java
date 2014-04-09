@@ -54,7 +54,7 @@ public class DATAPacket extends TFTPPacket {
         return outputStream.toByteArray();
     }
 
-    public boolean isDataPacket() {
-        return 3 == getOpcode();
+    public static boolean isDataPacket(DatagramPacket _dtg) {
+        return 3 == getOpcode(_dtg);
     }
 }

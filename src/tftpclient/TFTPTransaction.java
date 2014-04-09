@@ -16,6 +16,7 @@ public class TFTPTransaction {
     protected DatagramSocket _socket;
     protected Inet4Address _ip;
     protected int _port_dest;
+    protected String filename;
 
     public TFTPTransaction() {
         try {

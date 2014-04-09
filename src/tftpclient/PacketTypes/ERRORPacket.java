@@ -44,17 +44,17 @@ public class ERRORPacket extends TFTPPacket{
         
     }
     
-    private boolean isErrorPacket(){
-        return 5== getOpcode();
+    public static boolean isErrorPacket(DatagramPacket _dtg){
+        return 5== getOpcode(_dtg);
     }
     
-    private int getErrorCode(){
+    public static int getErrorCode(DatagramPacket _dtg){
         ByteBuffer data = ByteBuffer.allocate(2);
         data.put(_dtg.getData()[2]);
         data.put((int)1,_dtg.getData()[3]);
         return (int)data.get();
     }
-    private String getErrMsg(){
+    public static String getErrMsg(DatagramPacket _dtg){
         StringBuilder sbuf=new StringBuilder();
        for(int i= 4;i< _dtg.getData().length;i++){
            sbuf.append((char)_dtg.getData()[i]);

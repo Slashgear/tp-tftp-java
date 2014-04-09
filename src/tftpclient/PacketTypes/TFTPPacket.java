@@ -35,7 +35,7 @@ public class TFTPPacket {
         return data.array();
     }
 
-    public int getOpcode() {
+    public static int getOpcode(DatagramPacket _dtg) {
         ByteBuffer data = ByteBuffer.allocate(2);
         data.put(_dtg.getData()[0]);
         data.put((int)1,_dtg.getData()[1]);
