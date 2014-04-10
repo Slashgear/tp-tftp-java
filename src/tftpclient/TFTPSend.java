@@ -30,7 +30,11 @@ public class TFTPSend extends TFTPTransaction {
 
         this._port_dest = 69;
         filename = "platine-noirblanc.jpg";
-        this._ip = (Inet4Address) InetAddress.getLoopbackAddress();
+        try {
+            this._ip = (Inet4Address) InetAddress.getLocalHost();
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
@@ -46,7 +50,8 @@ public class TFTPSend extends TFTPTransaction {
         } else {
             System.out.println("Fichier Correct");
             try {
-                if (!_ip.isReachable(5000)) { // test if the Server Adress exist, and if it's reachable
+                if (!_ip.isReachable(10000)) { // test if the Server Adress exist, and if it's reachable
+                    System.out.println("Host non joignable");
                     return 2;
                 } else {
                     System.out.println("Adresse Correct");
@@ -91,7 +96,7 @@ public class TFTPSend extends TFTPTransaction {
                 return true;
             }
         } catch (IOException ex) {
-            Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Ack non reçu");
         }
         return false;
     }
@@ -136,9 +141,9 @@ public class TFTPSend extends TFTPTransaction {
                 return true;
             }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Fichier non trouvé");
         } catch (IOException ex) {
-            Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Echec lecture du fichier");
         }
         return false;
     }
@@ -160,7 +165,7 @@ public class TFTPSend extends TFTPTransaction {
                     return true;
                 }
             } catch (IOException ex) {
-                Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Echec transfert du paquet");
             }
             i++;
         }

@@ -22,6 +22,11 @@ public class TFTPClient {
         if(test.Sendfile()==0){
               System.out.println("\n\nTransfert Réussi!!");
         }
+        
+        /*TFTPReceive test1=new TFTPReceive();
+        if(test1.Receivefile()==0){
+            System.out.println("\n\nTransfert Terminé!!");
+        }*/
     }
     
 }

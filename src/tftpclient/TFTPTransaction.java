@@ -23,7 +23,7 @@ public class TFTPTransaction {
             _socket = new DatagramSocket();
             _socket.setSoTimeout(10000);
         } catch (SocketException ex) {
-            Logger.getLogger(TFTPTransaction.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Echec ouvertur du socket");
         }
     }
  
