@@ -30,11 +30,7 @@ public class TFTPSend extends TFTPTransaction {
 
         this._port_dest = 69;
         filename = "platine-noirblanc.jpg";
-        try {
-            this._ip = (Inet4Address) InetAddress.getLocalHost();
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this._ip = (Inet4Address) InetAddress.getLoopbackAddress();
 
     }
 
@@ -45,19 +41,20 @@ public class TFTPSend extends TFTPTransaction {
 
     public char Sendfile() {
 
-        if (!checkFile()) {
+        if (!checkFile()) { // Test if the File is reachable and if the File is readable
             return 1;
         } else {
             System.out.println("Fichier Correct");
             try {
-                if (!_ip.isReachable(5000)) {
+                if (!_ip.isReachable(5000)) { // test if the Server Adress exist, and if it's reachable
                     return 2;
                 } else {
                     System.out.println("Adresse Correct");
                     if (!WRQtry()) {
                         return 3;
                     } else {
-                        System.out.println("Envoi du WRQ réussi \n\nDébut du Transfers...\n");
+                        //Start the transmit of the file
+                        System.out.println("Envoi du WRQ réussi \n\nDébut du Transfert...\n");
                         if (!this.transmit()) {
                             return 4;
                         } else {
@@ -156,6 +153,7 @@ public class TFTPSend extends TFTPTransaction {
             try {
                 _socket.send(data_packet.getDtg());
                 _socket.receive(ack_dtg);
+                //Test if the answer is correct
                 if (ACKPacket.isACKPacket(ack_dtg) && j == ACKPacket.getBlockNb(ack_dtg)) {
                     System.out.println("ACK  :" + Arrays.toString(ack_dtg.getData()));
                     packet_lost = true;

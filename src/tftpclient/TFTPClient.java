@@ -20,7 +20,7 @@ public class TFTPClient {
     public static void main(String[] args) {
         TFTPSend test=new TFTPSend();
         if(test.Sendfile()==0){
-              System.out.println("\n\nTransfers Réussi!!");
+              System.out.println("\n\nTransfert Réussi!!");
         }
     }
     
