@@ -15,7 +15,6 @@ import tftpclient.PacketTypes.ACKPacket;
 import tftpclient.PacketTypes.DATAPacket;
 import tftpclient.PacketTypes.ERRORPacket;
 import tftpclient.PacketTypes.ReadRequestPacket;
-import tftpclient.PacketTypes.WriteRequestPacket;
 
 /**
  *
@@ -37,18 +36,22 @@ public class TFTPReceive extends TFTPTransaction {
     }
 
     public char Receivefile() {
-        char Crrv;
-        File fichier = new File(filename);
         try {
-            fichier.createNewFile();
-            FileOutputStream fos = new FileOutputStream(fichier);
-
-        } catch (FileNotFoundException ex) {
-            System.out.println("Fichier introuvé");
+            if (!_ip.isReachable(5000)) {
+                return 1;
+            } else {
+                DATAPacket dtg = RRQtry();
+                if (dtg == null) {
+                    return 2;
+                } else {
+                    transmit(dtg);
+                }
+            }
+            return 126;
         } catch (IOException ex) {
-            System.out.println("Fichier inouvrable");
+            System.out.println("Adress non joignable");
         }
-        return 126;
+        return 125;
     }
 
     public void sendRRQ() {
@@ -61,14 +64,16 @@ public class TFTPReceive extends TFTPTransaction {
     }
 
     public DATAPacket receiveRRQanswer() {
-        byte[] data = new byte[1024];
-        DatagramPacket dtg = new DatagramPacket(data, 1024);
+        byte[] data = new byte[512];
+        DatagramPacket dtg = new DatagramPacket(data, data.length);
         try {
             this._socket.receive(dtg);
-            System.out.println("ACK Answer:" + Arrays.toString(dtg.getData()));
             if (DATAPacket.isDataPacket(dtg)) {
                 _port_dest = dtg.getPort();
-                return new DATAPacket(dtg.getData(), dtg.getAddress(), dtg.getPort(), 1);
+                System.out.println(dtg.getLength());
+                byte[] truncate=new byte[dtg.getLength()-4];
+                System.arraycopy(dtg.getData(), 4, truncate, 0,dtg.getLength()-4);
+                return new DATAPacket(truncate,dtg.getAddress(),dtg.getPort(), 1);
             }
             if (ERRORPacket.isErrorPacket(dtg) && (1 != ERRORPacket.getErrorCode(dtg) || 2 != ERRORPacket.getErrorCode(dtg))) {
                 System.out.println(ERRORPacket.getErrMsg(dtg));
@@ -93,6 +98,44 @@ public class TFTPReceive extends TFTPTransaction {
             }
         }
         return null;
+    }
+    
+    public boolean transmit(DATAPacket dtg){
+        FileOutputStream fos = null;
+        try {
+            int i=0;
+            File fichier = new File(filename);
+            DatagramPacket _dtg=new DatagramPacket(new byte[512], 512);
+            fichier.createNewFile();
+            fos = new FileOutputStream(fichier);
+            fos.write(dtg.getData());
+            ACKPacket ack=new ACKPacket(_ip,dtg.getDtg().getPort(),ACKPacket.getBlockNb(dtg.getDtg()));
+            _socket.send(ack.getDtg());
+            System.out.println("ACK  :" + Arrays.toString(ack.getDtg().getData()));
+            if(_dtg.getLength()<512){
+                    return true;
+            }
+            while(true){
+                _socket.receive(_dtg);
+                System.out.println(Arrays.toString(_dtg.getData()));
+                ack=new ACKPacket(_ip,dtg.getDtg().getPort(),DATAPacket.getBlockNb(_dtg));
+                _socket.send(ack.getDtg());       
+                if(_dtg.getLength()<512){
+                    return true;
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(TFTPReceive.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TFTPReceive.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException ex) {
+                Logger.getLogger(TFTPReceive.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return false;
     }
 
 }

@@ -29,7 +29,6 @@ public class TFTPPacket {
     }
 
     public byte[] intTobyte2(int i) {
-        
         ByteBuffer data = ByteBuffer.allocate(2);
         data.putShort((short)i);
         return data.array();

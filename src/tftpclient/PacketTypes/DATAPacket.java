@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +32,8 @@ public class DATAPacket extends TFTPPacket {
             outputStream.write(tftp_opcode);
             outputStream.write(tftp_block_nb);
             outputStream.write(data);
+            
+            
             byte[] tftp_data = outputStream.toByteArray();
             System.out.println("DATA :"+Arrays.toString(tftp_data));
 
@@ -41,9 +44,11 @@ public class DATAPacket extends TFTPPacket {
         return null;
     }
 
-    public int getBlockNb(){
-        int i=(_dtg.getData()[3]<<8)&0xFF|(_dtg.getData()[2])&0xFF;
-        return  i;
+    public static int getBlockNb(DatagramPacket _dtg){
+        ByteBuffer data = ByteBuffer.allocate(2);
+        data.put(_dtg.getData()[2]);
+        data.put((int)1,_dtg.getData()[3]);
+        return (int)data.getShort(0);
     }
     
     public byte[] getData(){
