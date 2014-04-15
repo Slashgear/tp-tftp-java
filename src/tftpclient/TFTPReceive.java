@@ -27,7 +27,7 @@ public class TFTPReceive extends TFTPTransaction {
     public TFTPReceive() {
         super();
         this._port_dest = 69;
-        filename = "test.txt";
+        filename = "Capture.png";
         try {
             this._ip = (Inet4Address) InetAddress.getLocalHost();
         } catch (UnknownHostException ex) {
@@ -70,7 +70,6 @@ public class TFTPReceive extends TFTPTransaction {
             this._socket.receive(dtg);
             if (DATAPacket.isDataPacket(dtg)) {
                 _port_dest = dtg.getPort();
-                System.out.println(dtg.getLength());
                 byte[] truncate=new byte[dtg.getLength()-4];
                 System.arraycopy(dtg.getData(), 4, truncate, 0,dtg.getLength()-4);
                 return new DATAPacket(truncate,dtg.getAddress(),dtg.getPort(), 1);
@@ -112,13 +111,18 @@ public class TFTPReceive extends TFTPTransaction {
             ACKPacket ack=new ACKPacket(_ip,dtg.getDtg().getPort(),ACKPacket.getBlockNb(dtg.getDtg()));
             _socket.send(ack.getDtg());
             System.out.println("ACK  :" + Arrays.toString(ack.getDtg().getData()));
-            if(_dtg.getLength()<512){
+            if(dtg.getDtg().getLength()<512){
                     return true;
             }
             while(true){
                 _socket.receive(_dtg);
-                System.out.println(Arrays.toString(_dtg.getData()));
+                System.out.println("DATA :"+Arrays.toString(_dtg.getData()));
+                byte[] truncate=new byte[_dtg.getLength()-4];
+                System.arraycopy(_dtg.getData(), 4, truncate, 0,_dtg.getLength()-4);
+                System.out.println(Arrays.toString(truncate));
+                fos.write(truncate);
                 ack=new ACKPacket(_ip,dtg.getDtg().getPort(),DATAPacket.getBlockNb(_dtg));
+                System.out.println("ACK  :"+Arrays.toString(ack.getDtg().getData()));
                 _socket.send(ack.getDtg());       
                 if(_dtg.getLength()<512){
                     return true;
