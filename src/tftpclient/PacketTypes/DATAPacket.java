@@ -53,9 +53,7 @@ public class DATAPacket extends TFTPPacket {
     
     public byte[] getData(){
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        for(int i=4;i<_dtg.getData().length;i++){
-            outputStream.write(_dtg.getData()[i]);
-        }
+        outputStream.write(this.getDtg().getData(), 4, this.getDtg().getData().length-4);
         return outputStream.toByteArray();
     }
 
