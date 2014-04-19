@@ -13,7 +13,7 @@ import tftpclient.TFTPTransaction;
  *
  * @author Antoine
  */
-public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPObserver {
+public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPObserver,Runnable {
 
     /**
      * Creates new form FrSend
@@ -127,8 +127,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
     private void jButtonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEnvoyerActionPerformed
         if (jTextFieldIP.getText() != "") {
             if (jFileChooser.getSelectedFile()!=null) {
-                TFTPSend envoi = new TFTPSend(jFileChooser.getSelectedFile(), jTextFieldIP.getText());
-                envoi.Sendfile();
+                this.run();
             } else {
                 jTextArea1.append("Pas de fichier sélectionné \n");
             }
@@ -139,7 +138,6 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
 
     private void jButtonQuitterMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonQuitterMouseClicked
         System.exit(0);
-
     }//GEN-LAST:event_jButtonQuitterMouseClicked
 
 
@@ -187,5 +185,11 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
     @Override
     public void onErrorOccured(String errormsg) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void run() {
+        TFTPSend envoi = new TFTPSend(jFileChooser.getSelectedFile(), jTextFieldIP.getText());
+        envoi.Sendfile();
     }
 }

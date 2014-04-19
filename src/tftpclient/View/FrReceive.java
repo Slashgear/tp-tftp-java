@@ -17,7 +17,7 @@ import tftpclient.TFTPTransaction;
  *
  * @author Antoine
  */
-public class FrReceive extends javax.swing.JPanel implements ActionListener,TFTPObserver{
+public class FrReceive extends javax.swing.JPanel implements ActionListener,TFTPObserver,Runnable{
 
     /**
      * Creates new form FrReceive
@@ -124,8 +124,7 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener,TFTP
     private void jButtonTelechargerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTelechargerActionPerformed
         if(jTextFieldIP.getText()!=""){
             if(jTextFieldNomFichier.getText()!=""){
-                TFTPReceive reception = new TFTPReceive(jTextFieldNomFichier.getText(),jTextFieldIP.getText());
-                reception.Receivefile();
+                this.run();
             }else{
                 jTextArea1.append("Pas de nom de fichier\n");
             }
@@ -183,5 +182,11 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener,TFTP
     @Override
     public void onErrorOccured(String errormsg) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void run() {
+         TFTPReceive reception = new TFTPReceive(jTextFieldNomFichier.getText(),jTextFieldIP.getText());
+         reception.Receivefile();
     }
 }
