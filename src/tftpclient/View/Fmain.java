@@ -30,6 +30,7 @@ public class Fmain extends javax.swing.JFrame {
         jLabelMainTitre = new javax.swing.JLabel();
         jButtonTelecharger = new javax.swing.JButton();
         jButtonEnvoyer = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -53,6 +54,14 @@ public class Fmain extends javax.swing.JFrame {
             }
         });
 
+        jButton1.setText("Quitter");
+        jButton1.setActionCommand("Quitter");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -66,7 +75,8 @@ public class Fmain extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jButtonEnvoyer, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButtonTelecharger))
+                            .addComponent(jButtonTelecharger)
+                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(135, 135, 135))))
         );
         layout.setVerticalGroup(
@@ -78,7 +88,9 @@ public class Fmain extends javax.swing.JFrame {
                 .addComponent(jButtonTelecharger)
                 .addGap(18, 18, 18)
                 .addComponent(jButtonEnvoyer)
-                .addContainerGap(88, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jButton1)
+                .addContainerGap(45, Short.MAX_VALUE))
         );
 
         jButtonTelecharger.getAccessibleContext().setAccessibleDescription("");
@@ -87,13 +99,24 @@ public class Fmain extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonTelechargerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTelechargerActionPerformed
-        new FrReceive().setVisible(true);
-
+        FrReceive receive=new FrReceive();
+        this.getContentPane().removeAll();
+        this.setContentPane(receive);
+        this.pack();
+        this.setVisible(true); 
     }//GEN-LAST:event_jButtonTelechargerActionPerformed
 
     private void jButtonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEnvoyerActionPerformed
-        new FrSend().setVisible(true);
+        FrSend send=new FrSend();
+        this.getContentPane().removeAll();
+        this.setContentPane(send);
+        this.pack();
+        this.setVisible(true); 
     }//GEN-LAST:event_jButtonEnvoyerActionPerformed
+
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+        System.exit(0);
+    }//GEN-LAST:event_jButton1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -131,6 +154,7 @@ public class Fmain extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButtonEnvoyer;
     private javax.swing.JButton jButtonTelecharger;
     private javax.swing.JLabel jLabelMainTitre;

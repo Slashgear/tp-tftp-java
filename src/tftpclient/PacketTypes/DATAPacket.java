@@ -35,7 +35,7 @@ public class DATAPacket extends TFTPPacket {
             
             
             byte[] tftp_data = outputStream.toByteArray();
-            System.out.println("DATA :"+Arrays.toString(tftp_data));
+           
 
             return new DatagramPacket(tftp_data, tftp_data.length, ip, port);
         } catch (IOException ex) {

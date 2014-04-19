@@ -1,19 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tftpclient.View;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.filechooser.FileSystemView;
+import tftpclient.Observers.TFTPObserver;
+import tftpclient.TFTPReceive;
 import tftpclient.TFTPSend;
+import tftpclient.TFTPTransaction;
 
 /**
  *
  * @author Antoine
  */
-public class FrSend extends javax.swing.JFrame {
+public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPObserver {
 
     /**
      * Creates new form FrSend
@@ -31,30 +31,36 @@ public class FrSend extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jFileChooser1 = new javax.swing.JFileChooser();
         jTextFieldIP = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-        jLabel2 = new javax.swing.JLabel();
-        jButtonEnvoyer = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
         jButtonQuitter = new javax.swing.JButton();
         FileSystemView vueSysteme = FileSystemView.getFileSystemView();
         //récupération des répertoires
         File defaut = vueSysteme.getDefaultDirectory();
         jFileChooser = new javax.swing.JFileChooser(defaut);
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jLabel2 = new javax.swing.JLabel();
+        jButtonEnvoyer = new javax.swing.JButton();
 
         jTextFieldIP.setText("Adresse IP de destination");
-
-        jLabel1.setText("Adresse IP");
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setForeground(new java.awt.Color(0, 204, 0));
         jTextArea1.setRows(5);
         jScrollPane2.setViewportView(jTextArea1);
+
+        jLabel1.setText("Adresse IP");
+
+        jButtonQuitter.setText("Quitter");
+        jButtonQuitter.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButtonQuitterMouseClicked(evt);
+            }
+        });
+
+        jFileChooser.setCurrentDirectory(new java.io.File("Z:\\Programmes\\NetBeans 8.0\\System.getProperty(\"user.dir\" )"));
 
         jLabel2.setText("Choix du fichier");
 
@@ -65,15 +71,13 @@ public class FrSend extends javax.swing.JFrame {
             }
         });
 
-        jButtonQuitter.setText("Quitter");
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
+                .addComponent(jFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -109,70 +113,79 @@ public class FrSend extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jButtonQuitter)
                         .addGap(30, 30, 30)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(22, 22, 22)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jFileChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 369, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(69, Short.MAX_VALUE))
+                        .addComponent(jFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)))
+                .addContainerGap())
         );
-
-        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEnvoyerActionPerformed
-        //Récupération du nom du fichier
-        
-        // Envoi du fichier
-        //Bon constructeur à mettre avec le fichier en paramètre
-        TFTPSend envoi = new TFTPSend();
+        if (jTextFieldIP.getText() != "") {
+            if (jFileChooser.getSelectedFile()!=null) {
+                TFTPSend envoi = new TFTPSend(jFileChooser.getSelectedFile(), jTextFieldIP.getText());
+                envoi.Sendfile();
+            } else {
+                jTextArea1.append("Pas de fichier sélectionné \n");
+            }
+        } else {
+            jTextArea1.append("Pas d'ip saisie\n");
+        }
     }//GEN-LAST:event_jButtonEnvoyerActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FrSend.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FrSend.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FrSend.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FrSend.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    private void jButtonQuitterMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonQuitterMouseClicked
+        System.exit(0);
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new FrSend().setVisible(true);
-            }
-        });
-    }
+    }//GEN-LAST:event_jButtonQuitterMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonEnvoyer;
     private javax.swing.JButton jButtonQuitter;
     private javax.swing.JFileChooser jFileChooser;
-    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextFieldIP;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onFileSendingStarted(File sourceFile) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onFileSendingProgress(float percent) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onFileSendingEnded(TFTPTransaction client, File sourceFile) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onFileReceptionStarted(String remoteFileName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onFileReceptionEnded(TFTPTransaction client, File holder) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onErrorOccured(String errormsg) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

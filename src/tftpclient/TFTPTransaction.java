@@ -4,19 +4,17 @@ package tftpclient;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.SocketException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import tftpclient.Observers.TFTPObservable;
 
 /**
  *
  * @author Antoine
  */
-public class TFTPTransaction {
+public abstract class TFTPTransaction extends TFTPObservable{
     
     protected DatagramSocket _socket;
     protected Inet4Address _ip;
     protected int _port_dest;
-    protected String filename;
 
     public TFTPTransaction() {
         try {

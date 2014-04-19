@@ -25,29 +25,21 @@ public class TFTPSend extends TFTPTransaction {
     
     private File file;
 
-    public TFTPSend() {
+    public TFTPSend(File file,String ip) {
         super();
 
         this._port_dest = 69;
-        filename = "platine-noirblanc.jpg";
+        this.file=file;
         try {
-            this._ip = (Inet4Address) InetAddress.getLocalHost();
+            this._ip = (Inet4Address) InetAddress.getByName(ip);
         } catch (UnknownHostException ex) {
             Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
 
-    public boolean checkFile() {
-        file = new File(filename);
-        return file.exists() && file.canRead();
-    }
 
     public char Sendfile() {
-
-        if (!checkFile()) { // Test if the File is reachable and if the File is readable
-            return 1;
-        } else {
             System.out.println("Fichier Correct");
             try {
                 if (!_ip.isReachable(10000)) { // test if the Server Adress exist, and if it's reachable
@@ -58,11 +50,13 @@ public class TFTPSend extends TFTPTransaction {
                     if (!WRQtry()) {
                         return 3;
                     } else {
+                        fireFileSendingStarted(file);
                         //Start the transmit of the file
                         System.out.println("Envoi du WRQ réussi \n\nDébut du Transfert...\n");
                         if (!this.transmit()) {
                             return 4;
                         } else {
+                            fireFileSendingEnded(this, file);
                             return 0;
                         }
                     }
@@ -71,12 +65,11 @@ public class TFTPSend extends TFTPTransaction {
             } catch (IOException ex) {
                 Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
         return 126;
     }
 
     public void sendWRQ() {
-        WriteRequestPacket wrq_packet = new WriteRequestPacket(null, _ip, _port_dest, filename);
+        WriteRequestPacket wrq_packet = new WriteRequestPacket(null, _ip, _port_dest, file.getName());
         try {
             this._socket.send(wrq_packet.getDtg());
         } catch (IOException ex) {
@@ -156,6 +149,7 @@ public class TFTPSend extends TFTPTransaction {
         while (i < 3 || packet_lost) {
             DATAPacket data_packet = new DATAPacket(buf, _ip, _port_dest, j);
             try {
+                System.out.println("DATA :"+Arrays.toString(data_packet.getData()));
                 _socket.send(data_packet.getDtg());
                 _socket.receive(ack_dtg);
                 //Test if the answer is correct

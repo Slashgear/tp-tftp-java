@@ -24,13 +24,15 @@ public class TFTPReceive extends TFTPTransaction {
 
     private String directory_name;
     private static final int DEFAULT_PACKET_SIZE = 516;
+    protected String filename;
 
-    public TFTPReceive() {
+    public TFTPReceive(String filename, String ip) {
         super();
         this._port_dest = 69;
-        filename = "Damier.bmp";
+        directory_name = "..\\ZonedeDépot\\";
+        this.filename = filename;
         try {
-            this._ip = (Inet4Address) InetAddress.getLocalHost();
+            this._ip = (Inet4Address) Inet4Address.getByName(ip);
         } catch (UnknownHostException ex) {
             Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -41,8 +43,10 @@ public class TFTPReceive extends TFTPTransaction {
             if (!_ip.isReachable(5000)) {
                 return 1;
             } else {
+                System.out.println("Hote Joignable");
                 DATAPacket dtg = RRQtry();
                 if (dtg == null) {
+                    System.out.println("Erreur lors du Request: Fin exécution");
                     return 2;
                 } else {
                     if (transmit(dtg)) {
@@ -80,7 +84,7 @@ public class TFTPReceive extends TFTPTransaction {
             }
             if (ERRORPacket.isErrorPacket(dtg) && (1 != ERRORPacket.getErrorCode(dtg) || 2 != ERRORPacket.getErrorCode(dtg))) {
                 System.out.println(ERRORPacket.getErrMsg(dtg));
-                return null;
+                return new DATAPacket(new byte[0], dtg.getAddress(), dtg.getPort(), 1);
             }
         } catch (IOException ex) {
             System.out.println("Ack non reçu");
@@ -94,10 +98,13 @@ public class TFTPReceive extends TFTPTransaction {
         while (i < 3) {
             sendRRQ();
             dtg = receiveRRQanswer();
-            if (dtg != null) {
+            if (dtg.getData().length > 0) {
                 return dtg;
             } else {
-                ++i;
+                if (dtg == null) {
+                    ++i;
+                }
+                return null;
             }
         }
         return null;
@@ -107,10 +114,15 @@ public class TFTPReceive extends TFTPTransaction {
         FileOutputStream fos = null;
         try {
             int i = 1;
-            File fichier = new File(filename);
+            File fi = new File(directory_name);
+            if (!fi.isDirectory()) {
+                fi.mkdir();
+            }
+            File fichier = new File(directory_name + filename);
             DatagramPacket _dtg = new DatagramPacket(new byte[DEFAULT_PACKET_SIZE], DEFAULT_PACKET_SIZE);
             fichier.createNewFile();
             fos = new FileOutputStream(fichier);
+            System.out.println("DATA :" + Arrays.toString(dtg.getDtg().getData()));
             fos.write(dtg.getData());
             ACKPacket ack = new ACKPacket(_ip, dtg.getDtg().getPort(), ACKPacket.getBlockNb(dtg.getDtg()));
             _socket.send(ack.getDtg());
@@ -125,17 +137,17 @@ public class TFTPReceive extends TFTPTransaction {
                     fos.close();
                     return false;
                 } else {
-                        System.out.println("DATA :" + Arrays.toString(_dtg.getData()));
-                        byte[] truncate = new byte[_dtg.getLength() - 4];
-                        System.arraycopy(_dtg.getData(), 4, truncate, 0, _dtg.getLength() - 4);
-                        fos.write(truncate);
-                        ack = new ACKPacket(_ip, dtg.getDtg().getPort(), DATAPacket.getBlockNb(_dtg));
-                        System.out.println("ACK  :" + Arrays.toString(ack.getDtg().getData()));
-                        _socket.send(ack.getDtg());
-                        i++;
-                        if (_dtg.getLength() < 512) {
-                            break;
-                        }
+                    System.out.println("DATA :" + Arrays.toString(_dtg.getData()));
+                    byte[] truncate = new byte[_dtg.getLength() - 4];
+                    System.arraycopy(_dtg.getData(), 4, truncate, 0, _dtg.getLength() - 4);
+                    fos.write(truncate);
+                    ack = new ACKPacket(_ip, dtg.getDtg().getPort(), DATAPacket.getBlockNb(_dtg));
+                    System.out.println("ACK  :" + Arrays.toString(ack.getDtg().getData()));
+                    _socket.send(ack.getDtg());
+                    i++;
+                    if (_dtg.getLength() < 512) {
+                        break;
+                    }
                 }
             }
         } catch (FileNotFoundException ex) {
