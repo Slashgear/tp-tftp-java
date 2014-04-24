@@ -50,13 +50,11 @@ public class TFTPSend extends TFTPTransaction {
                     if (!WRQtry()) {
                         return 3;
                     } else {
-                        fireFileSendingStarted(file);
                         //Start the transmit of the file
                         System.out.println("Envoi du WRQ réussi \n\nDébut du Transfert...\n");
                         if (!this.transmit()) {
                             return 4;
                         } else {
-                            fireFileSendingEnded(this, file);
                             return 0;
                         }
                     }
@@ -68,7 +66,7 @@ public class TFTPSend extends TFTPTransaction {
         return 126;
     }
 
-    public void sendWRQ() {
+    private void sendWRQ() {
         WriteRequestPacket wrq_packet = new WriteRequestPacket(null, _ip, _port_dest, file.getName());
         try {
             this._socket.send(wrq_packet.getDtg());
@@ -77,7 +75,7 @@ public class TFTPSend extends TFTPTransaction {
         }
     }
 
-    public boolean receiveWRQanswer() {
+    private boolean receiveWRQanswer() {
         byte[] data = new byte[1024];
         DatagramPacket dtg = new DatagramPacket(data, 1024);
         try {
@@ -94,7 +92,7 @@ public class TFTPSend extends TFTPTransaction {
         return false;
     }
 
-    public boolean WRQtry() {
+    private boolean WRQtry() {
         int i = 0;
         boolean answer = false;
         while (i < 3) {
@@ -108,7 +106,7 @@ public class TFTPSend extends TFTPTransaction {
         return false;
     }
 
-    public boolean transmit() {
+    private boolean transmit() {
         FileInputStream fis = null;
         int j = 0;
         boolean packet_lost = false;

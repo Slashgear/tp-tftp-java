@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package tftpclient.View;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import javax.swing.SwingUtilities;
 import tftpclient.Observers.TFTPObserver;
 import tftpclient.TFTPReceive;
 import tftpclient.TFTPTransaction;
@@ -17,7 +17,9 @@ import tftpclient.TFTPTransaction;
  *
  * @author Antoine
  */
-public class FrReceive extends javax.swing.JPanel implements ActionListener,TFTPObserver,Runnable{
+public class FrReceive extends javax.swing.JPanel implements ActionListener, TFTPObserver, Runnable {
+
+    private TFTPReceive receive;
 
     /**
      * Creates new form FrReceive
@@ -88,16 +90,17 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener,TFTP
                         .addGap(163, 163, 163)
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(51, 51, 51)
-                        .addComponent(jTextFieldNomFichier, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(112, 112, 112)
                         .addComponent(jTextFieldIP, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(144, 144, 144)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButtonQuitter, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButtonTelecharger))))
+                        .addGap(51, 51, 51)
+                        .addComponent(jTextFieldNomFichier, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButtonQuitter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButtonTelecharger, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -113,24 +116,33 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener,TFTP
                 .addComponent(jTextFieldIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(48, 48, 48)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(25, 25, 25)
                 .addComponent(jButtonTelecharger)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButtonQuitter)
                 .addGap(105, 105, 105))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonTelechargerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTelechargerActionPerformed
-        if(jTextFieldIP.getText()!=""){
-            if(jTextFieldNomFichier.getText()!=""){
+        if (jTextFieldIP.getText() != "") {
+            if (jTextFieldNomFichier.getText() != "") {
+                receive = new TFTPReceive(jTextFieldNomFichier.getText(), jTextFieldIP.getText());
+                receive.addObserver(this);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        jButtonQuitter.enable(false);
+                        jButtonTelecharger.enable(false);
+                    }
+                });
                 this.run();
-            }else{
+            } else {
                 jTextArea1.append("Pas de nom de fichier\n");
             }
-        }else{
+        } else {
             jTextArea1.append("Pas d'ip saisie\n");
-        }   
+        }
     }//GEN-LAST:event_jButtonTelechargerActionPerformed
 
     private void jButtonQuitterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonQuitterActionPerformed
@@ -155,38 +167,46 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener,TFTP
     }
 
     @Override
-    public void onFileSendingStarted(File sourceFile) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public void onErrorOccured(final String errormsg) {
 
-    @Override
-    public void onFileSendingProgress(float percent) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onFileSendingEnded(TFTPTransaction client, File sourceFile) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onFileReceptionStarted(String remoteFileName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onFileReceptionEnded(TFTPTransaction client, File holder) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onErrorOccured(String errormsg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                jTextArea1.append(errormsg + "\n");
+            }
+        });
     }
 
     @Override
     public void run() {
-         TFTPReceive reception = new TFTPReceive(jTextFieldNomFichier.getText(),jTextFieldIP.getText());
-         reception.Receivefile();
+        receive.Receivefile();
+    }
+
+    @Override
+    public void onInfoSending(final String infoMsg) {
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                jTextArea1.append(infoMsg + "\n");
+            }
+        });
+    }
+
+    @Override
+    public void onSendingEnd(char valeur) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onReceivingEnd(char valeur) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                jButtonQuitter.enable(true);
+                jButtonTelecharger.enable(true);
+            }
+        });
+
     }
 }

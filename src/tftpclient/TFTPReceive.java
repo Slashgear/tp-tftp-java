@@ -6,11 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import tftpclient.PacketTypes.ACKPacket;
 import tftpclient.PacketTypes.DATAPacket;
 import tftpclient.PacketTypes.ERRORPacket;
@@ -39,39 +39,56 @@ public class TFTPReceive extends TFTPTransaction {
     }
 
     public char Receivefile() {
+        char crrv;
         try {
             if (!_ip.isReachable(5000)) {
-                return 1;
+                fireErrorOccured("Hote Non Joignable, Adresse Incorrect");
+                crrv = 1;
+                fireReceivingEnd(crrv);
+                return crrv;
             } else {
+                fireInfoSending("Hote Joignable");
                 System.out.println("Hote Joignable");
                 DATAPacket dtg = RRQtry();
                 if (dtg == null) {
+                    fireErrorOccured("Erreur lors du Request: Fin exécution");
                     System.out.println("Erreur lors du Request: Fin exécution");
-                    return 2;
+                    crrv = 2;
+                    fireReceivingEnd(crrv);
+                    return crrv;
                 } else {
+                    fireInfoSending("DEBUT Receive");
                     if (transmit(dtg)) {
-                        return 0;
+                        fireInfoSending("FIN Receive");
+                        crrv = 0;
+                        fireReceivingEnd(crrv);
+                        return crrv;
                     } else {
-                        return 3;
+                        fireInfoSending("FIN Receive : Téléchargement avorté");
+                        crrv = 3;
+                        fireReceivingEnd(crrv);
+                        return crrv;
                     }
                 }
             }
         } catch (IOException ex) {
+            fireErrorOccured("Adress non joignable");
             System.out.println("Adress non joignable");
         }
         return 125;
     }
 
-    public void sendRRQ() {
+    private void sendRRQ() {
         ReadRequestPacket rrq_packet = new ReadRequestPacket(null, _ip, _port_dest, filename);
         try {
             this._socket.send(rrq_packet.getDtg());
         } catch (IOException ex) {
             System.out.println("Echec sendRRQ");
+            fireErrorOccured("Echec sendRRQ");
         }
     }
 
-    public DATAPacket receiveRRQanswer() {
+    private DATAPacket receiveRRQanswer() {
         byte[] data = new byte[DEFAULT_PACKET_SIZE];
         DatagramPacket dtg = new DatagramPacket(data, data.length);
         try {
@@ -84,15 +101,17 @@ public class TFTPReceive extends TFTPTransaction {
             }
             if (ERRORPacket.isErrorPacket(dtg) && (1 != ERRORPacket.getErrorCode(dtg) || 2 != ERRORPacket.getErrorCode(dtg))) {
                 System.out.println(ERRORPacket.getErrMsg(dtg));
+                fireErrorOccured("Erreur lors du téléchargement: " + ERRORPacket.getErrMsg(dtg));
                 return new DATAPacket(new byte[0], dtg.getAddress(), dtg.getPort(), 1);
             }
         } catch (IOException ex) {
             System.out.println("Ack non reçu");
+            fireErrorOccured("Ack non reçu");
         }
         return null;
     }
 
-    public DATAPacket RRQtry() {
+    private DATAPacket RRQtry() {
         int i = 0;
         DATAPacket dtg;
         while (i < 3) {
@@ -110,7 +129,7 @@ public class TFTPReceive extends TFTPTransaction {
         return null;
     }
 
-    public boolean transmit(DATAPacket dtg) {
+    private boolean transmit(DATAPacket dtg) {
         FileOutputStream fos = null;
         try {
             int i = 1;
@@ -134,7 +153,9 @@ public class TFTPReceive extends TFTPTransaction {
                 _socket.receive(_dtg);
                 if (ERRORPacket.isErrorPacket(_dtg)) {
                     System.out.println("Une Erreur est survenue: " + ERRORPacket.getErrMsg(_dtg));
+                    fireErrorOccured("Une Erreur est survenue: " + ERRORPacket.getErrMsg(_dtg));
                     fos.close();
+                    fichier.delete();
                     return false;
                 } else {
                     System.out.println("DATA :" + Arrays.toString(_dtg.getData()));
@@ -151,9 +172,11 @@ public class TFTPReceive extends TFTPTransaction {
                 }
             }
         } catch (FileNotFoundException ex) {
+            fireErrorOccured("Fichier non-ouvrable");
             System.out.println("Fichier non-ouvrable");
             return false;
         } catch (IOException ex) {
+            fireErrorOccured("Délai d'attente dépassé");
             System.out.println("Délai d'attente dépassé");
             return false;
         } finally {
@@ -161,6 +184,7 @@ public class TFTPReceive extends TFTPTransaction {
                 fos.close();
             } catch (IOException ex) {
                 System.out.println("Fermeture du fichier impossible");
+                fireErrorOccured("Fermeture du fichier impossible");
             }
             return true;
         }

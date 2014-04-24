@@ -13,7 +13,7 @@ import tftpclient.TFTPTransaction;
  *
  * @author Antoine
  */
-public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPObserver,Runnable {
+public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPObserver, Runnable {
 
     /**
      * Creates new form FrSend
@@ -43,7 +43,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
         jLabel2 = new javax.swing.JLabel();
         jButtonEnvoyer = new javax.swing.JButton();
 
-        jTextFieldIP.setText("Adresse IP de destination");
+        jTextFieldIP.setToolTipText("Adresse IP de destination");
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
@@ -126,7 +126,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
 
     private void jButtonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEnvoyerActionPerformed
         if (jTextFieldIP.getText() != "") {
-            if (jFileChooser.getSelectedFile()!=null) {
+            if (jFileChooser.getSelectedFile() != null) {
                 this.run();
             } else {
                 jTextArea1.append("Pas de fichier sélectionné \n");
@@ -158,31 +158,6 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
     }
 
     @Override
-    public void onFileSendingStarted(File sourceFile) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onFileSendingProgress(float percent) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onFileSendingEnded(TFTPTransaction client, File sourceFile) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onFileReceptionStarted(String remoteFileName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onFileReceptionEnded(TFTPTransaction client, File holder) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public void onErrorOccured(String errormsg) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -190,6 +165,22 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
     @Override
     public void run() {
         TFTPSend envoi = new TFTPSend(jFileChooser.getSelectedFile(), jTextFieldIP.getText());
+        envoi.addObserver(this);
         envoi.Sendfile();
+    }
+
+    @Override
+    public void onInfoSending(String infoMsg) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onSendingEnd(char valeur) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onReceivingEnd(char valeur) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
