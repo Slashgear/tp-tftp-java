@@ -52,5 +52,10 @@ public class TFTPObservable {
             o.onSendingEnd(value);
         }
     }
-
+    
+    protected void fireProccessingSend(int value){
+        for (TFTPObserver o : observers) {
+            o.onProcessingSend(value);
+        }
+    }
 }

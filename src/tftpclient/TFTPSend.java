@@ -41,20 +41,28 @@ public class TFTPSend extends TFTPTransaction {
 
     public char Sendfile() {
             System.out.println("Fichier Correct");
+            fireInfoSending("Fichier Correct");
             try {
                 if (!_ip.isReachable(10000)) { // test if the Server Adress exist, and if it's reachable
                     System.out.println("Host non joignable");
+                    fireErrorOccured("Host non joignable");
                     return 2;
                 } else {
                     System.out.println("Adresse Correct");
+                    fireErrorOccured("Adresse Correct");
                     if (!WRQtry()) {
+                        fireErrorOccured("Pas de réponse du Serveur");
                         return 3;
                     } else {
                         //Start the transmit of the file
                         System.out.println("Envoi du WRQ réussi \n\nDébut du Transfert...\n");
+                        fireInfoSending("Envoi du WRQ réussi \n\nDébut du Transfert...\n");
                         if (!this.transmit()) {
+                            fireInfoSending("Erreur lors de l'envoi du fichier");
                             return 4;
                         } else {
+                            fireSendingEnd((char)0);
+                            System.out.println("Transfers Terminé");
                             return 0;
                         }
                     }
@@ -72,6 +80,7 @@ public class TFTPSend extends TFTPTransaction {
             this._socket.send(wrq_packet.getDtg());
         } catch (IOException ex) {
             System.out.println("Echec sendWRQ");
+            fireErrorOccured("Echec sendWRQ");
         }
     }
 
@@ -88,6 +97,7 @@ public class TFTPSend extends TFTPTransaction {
             }
         } catch (IOException ex) {
             System.out.println("Ack non reçu");
+            fireErrorOccured("Ack non reçu");
         }
         return false;
     }
@@ -133,8 +143,10 @@ public class TFTPSend extends TFTPTransaction {
             }
         } catch (FileNotFoundException ex) {
             System.out.println("Fichier non trouvé");
+            fireErrorOccured("Fichier non trouvé");
         } catch (IOException ex) {
             System.out.println("Echec lecture du fichier");
+            fireErrorOccured("Echec lecture du fichier");
         }
         return false;
     }
@@ -154,14 +166,21 @@ public class TFTPSend extends TFTPTransaction {
                 if (ACKPacket.isACKPacket(ack_dtg) && j == ACKPacket.getBlockNb(ack_dtg)) {
                     System.out.println("ACK  :" + Arrays.toString(ack_dtg.getData()));
                     packet_lost = true;
+                    fireProccessingSend((int) (((float)j/(file.length()/512))*100));
                     return true;
                 }
             } catch (IOException ex) {
                 System.out.println("Echec transfert du paquet");
+                fireErrorOccured("Echec transfert du paquet");
             }
             i++;
         }
         return packet_lost;
+    }
+
+    @Override
+    public void run() {
+        this.Sendfile();
     }
 
 }

@@ -190,4 +190,9 @@ public class TFTPReceive extends TFTPTransaction {
         }
     }
 
+    @Override
+    public void run() {
+        this.Receivefile();
+    }
+
 }

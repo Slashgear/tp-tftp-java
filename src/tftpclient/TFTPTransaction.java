@@ -10,7 +10,7 @@ import tftpclient.Observers.TFTPObservable;
  *
  * @author Antoine
  */
-public abstract class TFTPTransaction extends TFTPObservable{
+public abstract class TFTPTransaction extends TFTPObservable implements Runnable{
     
     protected DatagramSocket _socket;
     protected Inet4Address _ip;

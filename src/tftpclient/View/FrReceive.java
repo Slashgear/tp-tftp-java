@@ -11,13 +11,14 @@ import java.io.File;
 import javax.swing.SwingUtilities;
 import tftpclient.Observers.TFTPObserver;
 import tftpclient.TFTPReceive;
+import tftpclient.TFTPSend;
 import tftpclient.TFTPTransaction;
 
 /**
  *
  * @author Antoine
  */
-public class FrReceive extends javax.swing.JPanel implements ActionListener, TFTPObserver, Runnable {
+public class FrReceive extends javax.swing.JPanel implements ActionListener, TFTPObserver{
 
     private TFTPReceive receive;
 
@@ -136,7 +137,8 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener, TFT
                         jButtonTelecharger.enable(false);
                     }
                 });
-                this.run();
+                Thread monThread=new Thread(receive);
+                monThread.start();
             } else {
                 jTextArea1.append("Pas de nom de fichier\n");
             }
@@ -177,10 +179,6 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener, TFT
         });
     }
 
-    @Override
-    public void run() {
-        receive.Receivefile();
-    }
 
     @Override
     public void onInfoSending(final String infoMsg) {
@@ -208,5 +206,10 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener, TFT
             }
         });
 
+    }
+
+    @Override
+    public void onProcessingSend(int value) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

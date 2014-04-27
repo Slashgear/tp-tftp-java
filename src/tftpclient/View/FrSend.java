@@ -3,6 +3,7 @@ package tftpclient.View;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 import tftpclient.Observers.TFTPObserver;
 import tftpclient.TFTPReceive;
@@ -13,7 +14,7 @@ import tftpclient.TFTPTransaction;
  *
  * @author Antoine
  */
-public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPObserver, Runnable {
+public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPObserver {
 
     /**
      * Creates new form FrSend
@@ -42,6 +43,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
         jFileChooser = new javax.swing.JFileChooser(defaut);
         jLabel2 = new javax.swing.JLabel();
         jButtonEnvoyer = new javax.swing.JButton();
+        jProgressBar1 = new javax.swing.JProgressBar();
 
         jTextFieldIP.setToolTipText("Adresse IP de destination");
 
@@ -60,7 +62,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
             }
         });
 
-        jFileChooser.setCurrentDirectory(new java.io.File("Z:\\Programmes\\NetBeans 8.0\\System.getProperty(\"user.dir\" )"));
+        jFileChooser.setCurrentDirectory(new java.io.File("C:\\Program Files\\NetBeans 8.0\\System.getProperty(\"user.dir\" )"));
 
         jLabel2.setText("Choix du fichier");
 
@@ -77,23 +79,25 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jFileChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 404, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(49, 49, 49)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextFieldIP, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(35, 35, 35)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jButtonQuitter, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jButtonEnvoyer)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(49, 49, 49)
-                                .addComponent(jLabel1)))))
-                .addGap(52, 52, 52))
+                        .addGap(192, 192, 192)
+                        .addComponent(jButtonEnvoyer)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButtonQuitter, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(64, 64, 64)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jTextFieldIP, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+                            .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addGap(41, 41, 41))
             .addGroup(layout.createSequentialGroup()
                 .addGap(201, 201, 201)
                 .addComponent(jLabel2)
@@ -104,30 +108,33 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(59, 59, 59)
-                        .addComponent(jLabel1)
+                        .addGap(41, 41, 41)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(jButtonEnvoyer)
+                            .addComponent(jButtonQuitter))
                         .addGap(18, 18, 18)
                         .addComponent(jTextFieldIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButtonEnvoyer)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButtonQuitter)
-                        .addGap(30, 30, 30)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(51, 51, 51)
+                        .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(22, 22, 22)
                         .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addGap(18, 18, 18)
+                        .addComponent(jFileChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEnvoyerActionPerformed
         if (jTextFieldIP.getText() != "") {
             if (jFileChooser.getSelectedFile() != null) {
-                this.run();
+                TFTPSend send=new TFTPSend(jFileChooser.getSelectedFile(),jTextFieldIP.getText());
+                send.addObserver(this);
+                Thread monThread=new Thread(send);
+                monThread.start();
             } else {
                 jTextArea1.append("Pas de fichier sélectionné \n");
             }
@@ -147,6 +154,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
     private javax.swing.JFileChooser jFileChooser;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextFieldIP;
@@ -158,29 +166,49 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
     }
 
     @Override
-    public void onErrorOccured(String errormsg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void onErrorOccured(final String errormsg) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                jTextArea1.append(errormsg + "\n");
+            }
+        });
     }
 
-    @Override
-    public void run() {
-        TFTPSend envoi = new TFTPSend(jFileChooser.getSelectedFile(), jTextFieldIP.getText());
-        envoi.addObserver(this);
-        envoi.Sendfile();
-    }
 
     @Override
-    public void onInfoSending(String infoMsg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void onInfoSending(final String infoMsg) {
+           SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                jTextArea1.append(infoMsg + "\n");
+            }
+        });
     }
 
     @Override
     public void onSendingEnd(char valeur) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                jTextArea1.append("Transfers Terminé avec succès" + "\n");
+                jProgressBar1.setValue(0);
+            }
+        });
     }
 
     @Override
     public void onReceivingEnd(char valeur) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onProcessingSend(final int value) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                jProgressBar1.setValue(value);
+            }
+        });
     }
 }
