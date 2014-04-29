@@ -165,7 +165,6 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener, TFT
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -193,7 +192,6 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener, TFT
 
     @Override
     public void onSendingEnd(char valeur) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -210,6 +208,5 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener, TFT
 
     @Override
     public void onProcessingSend(int value) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

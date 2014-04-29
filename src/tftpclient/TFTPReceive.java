@@ -74,8 +74,8 @@ public class TFTPReceive extends TFTPTransaction {
         } catch (IOException ex) {
             fireErrorOccured("Adress non joignable");
             System.out.println("Adress non joignable");
+            return 125;
         }
-        return 125;
     }
 
     private void sendRRQ() {
@@ -92,21 +92,26 @@ public class TFTPReceive extends TFTPTransaction {
         byte[] data = new byte[DEFAULT_PACKET_SIZE];
         DatagramPacket dtg = new DatagramPacket(data, data.length);
         try {
+            //écoute de la réponse du serveur
             this._socket.receive(dtg);
             if (DATAPacket.isDataPacket(dtg)) {
+                //Si le serveur accepte le RRQ, il répond directement avec le premier DATAPacket
                 _port_dest = dtg.getPort();
                 byte[] truncate = new byte[dtg.getLength() - 4];
                 System.arraycopy(dtg.getData(), 4, truncate, 0, dtg.getLength() - 4);
                 return new DATAPacket(truncate, dtg.getAddress(), dtg.getPort(), 1);
             }
             if (ERRORPacket.isErrorPacket(dtg) && (1 != ERRORPacket.getErrorCode(dtg) || 2 != ERRORPacket.getErrorCode(dtg))) {
+                //Si le serveur ne trouve pas le fichier, ou si le client n'a pas les droits d'accès.
                 System.out.println(ERRORPacket.getErrMsg(dtg));
                 fireErrorOccured("Erreur lors du téléchargement: " + ERRORPacket.getErrMsg(dtg));
-                return new DATAPacket(new byte[0], dtg.getAddress(), dtg.getPort(), 1);
+                return null;
             }
         } catch (IOException ex) {
+            //Si aucun ACK n'est reçu
             System.out.println("Ack non reçu");
             fireErrorOccured("Ack non reçu");
+            return new DATAPacket(new byte[0], _ip, _port_dest, _port_dest);
         }
         return null;
     }
@@ -114,26 +119,30 @@ public class TFTPReceive extends TFTPTransaction {
     private DATAPacket RRQtry() {
         int i = 0;
         DATAPacket dtg;
-        while (i < 3) {
+        while (i < 3) { // On réalise 3 envoi de RRQ
             sendRRQ();
             dtg = receiveRRQanswer();
-            if (dtg.getData().length > 0) {
-                return dtg;
-            } else {
-                if (dtg == null) {
-                    ++i;
-                }
+            if (dtg == null) {
+                //Si le serveur répond non
                 return null;
+            } else {
+                if (dtg.getData().length > 0) {
+                    //Si la réponse reçu correspond à des données
+                    return dtg;
+                }
             }
+            //itère si le seveur ne répond pas
+            i++;
         }
         return null;
     }
+    
 
     private boolean transmit(DATAPacket dtg) {
         FileOutputStream fos = null;
         try {
             int i = 1;
-            File fi = new File(directory_name);
+            File fi = new File(directory_name); //Création de la Zone de dépot si elle n'existe pas
             if (!fi.isDirectory()) {
                 fi.mkdir();
             }
@@ -142,40 +151,53 @@ public class TFTPReceive extends TFTPTransaction {
             fichier.createNewFile();
             fos = new FileOutputStream(fichier);
             System.out.println("DATA :" + Arrays.toString(dtg.getDtg().getData()));
+            //On écrit le premier DATAPacket dans le fichier
             fos.write(dtg.getData());
+            
+            //Réponse de l'ACk de ce premier paquet
             ACKPacket ack = new ACKPacket(_ip, dtg.getDtg().getPort(), ACKPacket.getBlockNb(dtg.getDtg()));
             _socket.send(ack.getDtg());
             System.out.println("ACK  :" + Arrays.toString(ack.getDtg().getData()));
+            
             if (dtg.getDtg().getLength() < 512) {
                 return true;
             }
             while (true) {
+                //On écoute le paquet suivant
                 _socket.receive(_dtg);
                 if (ERRORPacket.isErrorPacket(_dtg)) {
+                    //Si le serveur répond à tout moment par un paquet d'erreur on arrete le transfert 
                     System.out.println("Une Erreur est survenue: " + ERRORPacket.getErrMsg(_dtg));
                     fireErrorOccured("Une Erreur est survenue: " + ERRORPacket.getErrMsg(_dtg));
                     fos.close();
+                    //Suppression du fichier crée
                     fichier.delete();
                     return false;
                 } else {
+                    
                     System.out.println("DATA :" + Arrays.toString(_dtg.getData()));
                     byte[] truncate = new byte[_dtg.getLength() - 4];
                     System.arraycopy(_dtg.getData(), 4, truncate, 0, _dtg.getLength() - 4);
+                    //écriture des données
                     fos.write(truncate);
                     ack = new ACKPacket(_ip, dtg.getDtg().getPort(), DATAPacket.getBlockNb(_dtg));
                     System.out.println("ACK  :" + Arrays.toString(ack.getDtg().getData()));
+                    //réponse de l'ACK
                     _socket.send(ack.getDtg());
                     i++;
+                    //On s'arrete si le paquet reçu a une taille inférieur à 512.
                     if (_dtg.getLength() < 512) {
                         break;
                     }
                 }
             }
         } catch (FileNotFoundException ex) {
+            //Si on le peut pas ouvrir le fichier
             fireErrorOccured("Fichier non-ouvrable");
             System.out.println("Fichier non-ouvrable");
             return false;
         } catch (IOException ex) {
+            //Si le serveur ne répond plus
             fireErrorOccured("Délai d'attente dépassé");
             System.out.println("Délai d'attente dépassé");
             return false;

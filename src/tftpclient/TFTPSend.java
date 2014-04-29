@@ -46,20 +46,20 @@ public class TFTPSend extends TFTPTransaction {
                 if (!_ip.isReachable(10000)) { // test if the Server Adress exist, and if it's reachable
                     System.out.println("Host non joignable");
                     fireErrorOccured("Host non joignable");
-                    return 2;
+                    return 1;
                 } else {
                     System.out.println("Adresse Correct");
                     fireErrorOccured("Adresse Correct");
                     if (!WRQtry()) {
                         fireErrorOccured("Pas de réponse du Serveur");
-                        return 3;
+                        return 2;
                     } else {
                         //Start the transmit of the file
                         System.out.println("Envoi du WRQ réussi \n\nDébut du Transfert...\n");
                         fireInfoSending("Envoi du WRQ réussi \n\nDébut du Transfert...\n");
                         if (!this.transmit()) {
                             fireInfoSending("Erreur lors de l'envoi du fichier");
-                            return 4;
+                            return 3;
                         } else {
                             fireSendingEnd((char)0);
                             System.out.println("Transfers Terminé");
@@ -69,9 +69,10 @@ public class TFTPSend extends TFTPTransaction {
 
                 }
             } catch (IOException ex) {
-                Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Pas de réponse du Serveur");
+                fireErrorOccured("Pas de réponse du Serveur");
             }
-        return 126;
+        return 125;
     }
 
     private void sendWRQ() {

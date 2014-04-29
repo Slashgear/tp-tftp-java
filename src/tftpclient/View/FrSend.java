@@ -199,7 +199,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
 
     @Override
     public void onReceivingEnd(char valeur) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
     @Override
