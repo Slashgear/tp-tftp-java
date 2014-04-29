@@ -129,7 +129,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEnvoyerActionPerformed
-        if (jTextFieldIP.getText() != "") {
+        if (jTextFieldIP.getText().length() == 0) {
             if (jFileChooser.getSelectedFile() != null) {
                 TFTPSend send=new TFTPSend(jFileChooser.getSelectedFile(),jTextFieldIP.getText());
                 send.addObserver(this);

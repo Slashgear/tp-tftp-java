@@ -126,8 +126,8 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener, TFT
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonTelechargerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTelechargerActionPerformed
-        if (jTextFieldIP.getText() != "") {
-            if (jTextFieldNomFichier.getText() != "") {
+        if (!"".equals(jTextFieldIP.getText())) {
+            if (!"".equals(jTextFieldNomFichier.getText())) {
                 receive = new TFTPReceive(jTextFieldNomFichier.getText(), jTextFieldIP.getText());
                 receive.addObserver(this);
                 SwingUtilities.invokeLater(new Runnable() {
