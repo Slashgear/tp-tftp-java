@@ -28,11 +28,10 @@ public class TFTPReceive extends TFTPTransaction {
 
     public TFTPReceive(String filename, String ip) {
         super();
-        this._port_dest = 69;
         directory_name = "..\\ZonedeDépot\\";
         this.filename = filename;
         try {
-            this._ip = (Inet4Address) Inet4Address.getByName(ip);
+            this.setIp((Inet4Address) Inet4Address.getByName(ip));
         } catch (UnknownHostException ex) {
             Logger.getLogger(TFTPSend.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -41,7 +40,7 @@ public class TFTPReceive extends TFTPTransaction {
     public char Receivefile() {
         char crrv;
         try {
-            if (!_ip.isReachable(5000)) {
+            if (!this.getIp().isReachable(5000)) { // Test si l'adresse distante existe
                 fireErrorOccured("Hote Non Joignable, Adresse Incorrect");
                 crrv = 1;
                 fireReceivingEnd(crrv);
@@ -49,8 +48,8 @@ public class TFTPReceive extends TFTPTransaction {
             } else {
                 fireInfoSending("Hote Joignable");
                 System.out.println("Hote Joignable");
-                DATAPacket dtg = RRQtry();
-                if (dtg == null) {
+                DATAPacket dtg = RRQtry(); // Demande de lescture du Fichier demandé
+                if (dtg == null) { //Si le paquet reçu est une erreur ou si il n' y a pas eu de réponse
                     fireErrorOccured("Erreur lors du Request: Fin exécution");
                     System.out.println("Erreur lors du Request: Fin exécution");
                     crrv = 2;
@@ -58,12 +57,13 @@ public class TFTPReceive extends TFTPTransaction {
                     return crrv;
                 } else {
                     fireInfoSending("DEBUT Receive");
-                    if (transmit(dtg)) {
+                    if (transmit(dtg)) { //Lancement du receive par l'ACk du premier packet reçu
                         fireInfoSending("FIN Receive");
                         crrv = 0;
                         fireReceivingEnd(crrv);
                         return crrv;
                     } else {
+                        // En cas d'erreur lors du téléchargement
                         fireInfoSending("FIN Receive : Téléchargement avorté");
                         crrv = 3;
                         fireReceivingEnd(crrv);
@@ -79,9 +79,9 @@ public class TFTPReceive extends TFTPTransaction {
     }
 
     private void sendRRQ() {
-        ReadRequestPacket rrq_packet = new ReadRequestPacket(null, _ip, _port_dest, filename);
+        ReadRequestPacket rrq_packet = new ReadRequestPacket(null, this.getIp(), this.getPort_dest(), filename);
         try {
-            this._socket.send(rrq_packet.getDtg());
+            this.getSocket().send(rrq_packet.getDtg());
         } catch (IOException ex) {
             System.out.println("Echec sendRRQ");
             fireErrorOccured("Echec sendRRQ");
@@ -93,10 +93,10 @@ public class TFTPReceive extends TFTPTransaction {
         DatagramPacket dtg = new DatagramPacket(data, data.length);
         try {
             //écoute de la réponse du serveur
-            this._socket.receive(dtg);
+            this.getSocket().receive(dtg);
             if (DATAPacket.isDataPacket(dtg)) {
                 //Si le serveur accepte le RRQ, il répond directement avec le premier DATAPacket
-                _port_dest = dtg.getPort();
+                this.setPort_dest(dtg.getPort());
                 byte[] truncate = new byte[dtg.getLength() - 4];
                 System.arraycopy(dtg.getData(), 4, truncate, 0, dtg.getLength() - 4);
                 return new DATAPacket(truncate, dtg.getAddress(), dtg.getPort(), 1);
@@ -111,7 +111,7 @@ public class TFTPReceive extends TFTPTransaction {
             //Si aucun ACK n'est reçu
             System.out.println("Ack non reçu");
             fireErrorOccured("Ack non reçu");
-            return new DATAPacket(new byte[0], _ip, _port_dest, _port_dest);
+            return new DATAPacket(new byte[0], this.getIp(), this.getPort_dest(), this.getPort_dest());
         }
         return null;
     }
@@ -136,7 +136,6 @@ public class TFTPReceive extends TFTPTransaction {
         }
         return null;
     }
-    
 
     private boolean transmit(DATAPacket dtg) {
         FileOutputStream fos = null;
@@ -153,18 +152,18 @@ public class TFTPReceive extends TFTPTransaction {
             System.out.println("DATA :" + Arrays.toString(dtg.getDtg().getData()));
             //On écrit le premier DATAPacket dans le fichier
             fos.write(dtg.getData());
-            
+
             //Réponse de l'ACk de ce premier paquet
-            ACKPacket ack = new ACKPacket(_ip, dtg.getDtg().getPort(), ACKPacket.getBlockNb(dtg.getDtg()));
-            _socket.send(ack.getDtg());
+            ACKPacket ack = new ACKPacket(this.getIp(), dtg.getDtg().getPort(), ACKPacket.getBlockNb(dtg.getDtg()));
+            this.getSocket().send(ack.getDtg());
             System.out.println("ACK  :" + Arrays.toString(ack.getDtg().getData()));
-            
+
             if (dtg.getDtg().getLength() < 512) {
                 return true;
             }
             while (true) {
                 //On écoute le paquet suivant
-                _socket.receive(_dtg);
+                this.getSocket().receive(_dtg);
                 if (ERRORPacket.isErrorPacket(_dtg)) {
                     //Si le serveur répond à tout moment par un paquet d'erreur on arrete le transfert 
                     System.out.println("Une Erreur est survenue: " + ERRORPacket.getErrMsg(_dtg));
@@ -174,16 +173,16 @@ public class TFTPReceive extends TFTPTransaction {
                     fichier.delete();
                     return false;
                 } else {
-                    
+
                     System.out.println("DATA :" + Arrays.toString(_dtg.getData()));
                     byte[] truncate = new byte[_dtg.getLength() - 4];
                     System.arraycopy(_dtg.getData(), 4, truncate, 0, _dtg.getLength() - 4);
                     //écriture des données
                     fos.write(truncate);
-                    ack = new ACKPacket(_ip, dtg.getDtg().getPort(), DATAPacket.getBlockNb(_dtg));
+                    ack = new ACKPacket(this.getIp(), dtg.getDtg().getPort(), DATAPacket.getBlockNb(_dtg));
                     System.out.println("ACK  :" + Arrays.toString(ack.getDtg().getData()));
                     //réponse de l'ACK
-                    _socket.send(ack.getDtg());
+                    this.getSocket().send(ack.getDtg());
                     i++;
                     //On s'arrete si le paquet reçu a une taille inférieur à 512.
                     if (_dtg.getLength() < 512) {
@@ -204,11 +203,12 @@ public class TFTPReceive extends TFTPTransaction {
         } finally {
             try {
                 fos.close();
+                return true;
             } catch (IOException ex) {
                 System.out.println("Fermeture du fichier impossible");
                 fireErrorOccured("Fermeture du fichier impossible");
+                return false;
             }
-            return true;
         }
     }
 

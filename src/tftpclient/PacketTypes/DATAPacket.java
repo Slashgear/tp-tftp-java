@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tftpclient.PacketTypes;
 
 import java.io.ByteArrayOutputStream;
@@ -10,9 +5,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -32,28 +24,26 @@ public class DATAPacket extends TFTPPacket {
             outputStream.write(tftp_opcode);
             outputStream.write(tftp_block_nb);
             outputStream.write(data);
-            
-            
+
             byte[] tftp_data = outputStream.toByteArray();
-           
 
             return new DatagramPacket(tftp_data, tftp_data.length, ip, port);
         } catch (IOException ex) {
-            Logger.getLogger(DATAPacket.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Erreur lors de la création du DATApacket n° " + number);
         }
         return null;
     }
 
-    public static int getBlockNb(DatagramPacket _dtg){
+    public static int getBlockNb(DatagramPacket _dtg) {
         ByteBuffer data = ByteBuffer.allocate(2);
         data.put(_dtg.getData()[2]);
-        data.put((int)1,_dtg.getData()[3]);
-        return (int)data.getShort(0);
+        data.put((int) 1, _dtg.getData()[3]);
+        return (int) data.getShort(0);
     }
-    
-    public byte[] getData(){
+
+    public byte[] getData() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        outputStream.write(this.getDtg().getData(), 4, this.getDtg().getData().length-4);
+        outputStream.write(this.getDtg().getData(), 4, this.getDtg().getData().length - 4);
         return outputStream.toByteArray();
     }
 

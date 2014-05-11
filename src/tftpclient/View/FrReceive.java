@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tftpclient.View;
 
 import java.awt.event.ActionEvent;
@@ -18,7 +13,7 @@ import tftpclient.TFTPTransaction;
  *
  * @author Antoine
  */
-public class FrReceive extends javax.swing.JPanel implements ActionListener, TFTPObserver{
+public class FrReceive extends javax.swing.JPanel implements ActionListener, TFTPObserver {
 
     private TFTPReceive receive;
 
@@ -137,7 +132,7 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener, TFT
                         jButtonTelecharger.enable(false);
                     }
                 });
-                Thread monThread=new Thread(receive);
+                Thread monThread = new Thread(receive);
                 monThread.start();
             } else {
                 jTextArea1.append("Pas de nom de fichier\n");
@@ -177,7 +172,6 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener, TFT
             }
         });
     }
-
 
     @Override
     public void onInfoSending(final String infoMsg) {

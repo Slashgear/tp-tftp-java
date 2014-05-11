@@ -1,9 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tftpclient.View;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  *
@@ -96,19 +94,19 @@ public class Fmain extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonTelechargerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTelechargerActionPerformed
-        FrReceive receive=new FrReceive();
+        FrReceive receive = new FrReceive();
         this.getContentPane().removeAll();
         this.setContentPane(receive);
         this.pack();
-        this.setVisible(true); 
+        this.setVisible(true);
     }//GEN-LAST:event_jButtonTelechargerActionPerformed
 
     private void jButtonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEnvoyerActionPerformed
-        FrSend send=new FrSend();
+        FrSend send = new FrSend();
         this.getContentPane().removeAll();
         this.setContentPane(send);
         this.pack();
-        this.setVisible(true); 
+        this.setVisible(true);
     }//GEN-LAST:event_jButtonEnvoyerActionPerformed
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked

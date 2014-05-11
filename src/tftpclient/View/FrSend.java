@@ -6,9 +6,7 @@ import java.io.File;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 import tftpclient.Observers.TFTPObserver;
-import tftpclient.TFTPReceive;
 import tftpclient.TFTPSend;
-import tftpclient.TFTPTransaction;
 
 /**
  *
@@ -131,9 +129,9 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
     private void jButtonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEnvoyerActionPerformed
         if (jTextFieldIP.getText().length() != 0) {
             if (jFileChooser.getSelectedFile() != null) {
-                TFTPSend send=new TFTPSend(jFileChooser.getSelectedFile(),jTextFieldIP.getText());
+                TFTPSend send = new TFTPSend(jFileChooser.getSelectedFile(), jTextFieldIP.getText());
                 send.addObserver(this);
-                Thread monThread=new Thread(send);
+                Thread monThread = new Thread(send);
                 monThread.start();
             } else {
                 jTextArea1.append("Pas de fichier sélectionné \n");
@@ -144,6 +142,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
     }//GEN-LAST:event_jButtonEnvoyerActionPerformed
 
     private void jButtonQuitterMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonQuitterMouseClicked
+        
         System.exit(0);
     }//GEN-LAST:event_jButtonQuitterMouseClicked
 
@@ -175,10 +174,9 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
         });
     }
 
-
     @Override
     public void onInfoSending(final String infoMsg) {
-           SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 jTextArea1.append(infoMsg + "\n");
@@ -188,7 +186,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
 
     @Override
     public void onSendingEnd(char valeur) {
-       SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 jTextArea1.append("Transfers Terminé avec succès" + "\n");
@@ -199,7 +197,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
 
     @Override
     public void onReceivingEnd(char valeur) {
-        
+
     }
 
     @Override

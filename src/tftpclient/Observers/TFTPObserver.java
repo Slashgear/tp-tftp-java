@@ -1,9 +1,6 @@
 
 package tftpclient.Observers;
 
-import java.io.File;
-import tftpclient.TFTPTransaction;
-
 /**
  *
  * @author Antoine
