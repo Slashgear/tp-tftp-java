@@ -143,6 +143,7 @@ public class FrReceive extends javax.swing.JPanel implements ActionListener, TFT
     }//GEN-LAST:event_jButtonTelechargerActionPerformed
 
     private void jButtonQuitterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonQuitterActionPerformed
+
         System.exit(0);
     }//GEN-LAST:event_jButtonQuitterActionPerformed
 

@@ -60,7 +60,7 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
             }
         });
 
-        jFileChooser.setCurrentDirectory(new java.io.File("C:\\Program Files\\NetBeans 8.0\\System.getProperty(\"user.dir\" )"));
+        jFileChooser.setCurrentDirectory(new java.io.File("Z:\\Programmes\\NetBeans 8.0\\System.getProperty(\"user.dir\" )"));
 
         jLabel2.setText("Choix du fichier");
 
@@ -124,6 +124,8 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
                         .addComponent(jFileChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(59, Short.MAX_VALUE))
         );
+
+        jFileChooser.getAccessibleContext().setAccessibleParent(jButtonQuitter);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEnvoyerActionPerformed
@@ -142,7 +144,8 @@ public class FrSend extends javax.swing.JPanel implements ActionListener, TFTPOb
     }//GEN-LAST:event_jButtonEnvoyerActionPerformed
 
     private void jButtonQuitterMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonQuitterMouseClicked
-        
+        jFileChooser.setVisible(false);
+        this.removeAll();
         System.exit(0);
     }//GEN-LAST:event_jButtonQuitterMouseClicked
 
